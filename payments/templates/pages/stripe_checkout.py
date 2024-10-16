@@ -82,7 +82,6 @@ def make_payment(stripe_token_id, data, reference_doctype=None, reference_docnam
 	data.update({"stripe_token_id": stripe_token_id})
 
 	gateway_controller = get_gateway_controller(reference_doctype, reference_docname)
-	payment_entry(stripe_token_id, data,reference_doctype,reference_docname)
 
 	if is_a_subscription(reference_doctype, reference_docname):
 		reference = frappe.get_doc(reference_doctype, reference_docname)
@@ -176,7 +175,7 @@ def payment_entry(stripe_token_id, data, reference_doctype, reference_docname):
 
         # Fetch the required accounts (for debiting and crediting)
         receivable_account = frappe.get_value("Company", invoice.company, "default_receivable_account")
-        bank_account = frappe.get_value("Company", invoice.company, "default_bank_account")
+        bank_account = invoice.custom_payment_account_2
 
         # Prepare GL Entries for both transaction and account currencies
         gl_entries = [
@@ -225,6 +224,7 @@ def payment_entry(stripe_token_id, data, reference_doctype, reference_docname):
 
         # Mark the Sales Invoice as Paid
         frappe.db.set_value("Sales Invoice", invoice.reference_name, "status", "Paid")
+        frappe.db.set_value("Sales Invoice", invoice.reference_name, "outstanding_amount", 0)
 
         # Commit changes to DB
         frappe.db.commit()

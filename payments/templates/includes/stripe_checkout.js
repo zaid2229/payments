@@ -45,6 +45,15 @@ function setOutcome(result) {
 				if (r.message.status == "Completed") {
 					$('#submit').hide()
 					$('.success').show()
+					frappe.call({
+						method:"payments.templates.pages.stripe_checkout.payment_entry",
+						args: {
+							"stripe_token_id": result.token.id,
+							"data": JSON.stringify({{ frappe.form_dict|json }}),
+							"reference_doctype": "{{ reference_doctype }}",
+							"reference_docname": "{{ reference_docname }}"
+						}})
+					
 					setTimeout(function() {
 						window.location.href = r.message.redirect_to
 					}, 2000);
