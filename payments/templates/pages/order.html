@@ -76,6 +76,13 @@
 				{%- set party_name = doc.supplier_name if doc.doctype in ['Supplier Quotation', 'Purchase Invoice', 'Purchase
 				Order'] else doc.customer_name %}
 				<b>{{ party_name }}</b>
+				<div>
+					<span class="col-5">
+						{{ doc.custom_comments }}
+					</span>
+					</div>
+
+				
 
 				{% if doc.contact_display and doc.contact_display != party_name %}
 					<br>
@@ -95,6 +102,7 @@
 					<span class="col-5">
 						{{ _("Item") }}
 					</span>
+
 					<span class="d-s-n col-3">
 						{{ _("Quantity") }}
 					</span>

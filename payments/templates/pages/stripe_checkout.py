@@ -24,11 +24,16 @@ expected_keys = (
 	"currency",
 )
 
+print(expected_keys)
+
+
+
+
 
 def get_context(context):
 	context.no_cache = 1
 
-	# all these keys exist in form_dict
+	# all these keys exist in form_dict  
 	if not (set(expected_keys) - set(list(frappe.form_dict))):
 		for key in expected_keys:
 			context[key] = frappe.form_dict[key]
@@ -98,6 +103,57 @@ def is_a_subscription(reference_doctype, reference_docname):
 
 import frappe
 from frappe.utils import flt, nowdate
+from erpnext.accounts.doctype.payment_request.payment_request import PaymentRequest
+from erpnext.accounts.doctype.subscription_plan.subscription_plan import get_plan_rate
+from erpnext.accounts.party import get_party_account, get_party_bank_account
+from erpnext.accounts.utils import get_account_currency, get_currency_precision
+from erpnext.utilities import payment_app_import_guard
+
+
+def _get_payment_gateway_controller(*args, **kwargs):
+	with payment_app_import_guard():
+		from payments.utils import get_payment_gateway_controller
+
+	return get_payment_gateway_controller(*args, **kwargs)
+
+
+from frappe.model.document import Document
+
+
+class CUSTPaymentRequest(Document):
+    def get_payment_url(self):
+        if self.reference_doctype != "Fees":
+            data = frappe.db.get_value(
+                self.reference_doctype, self.reference_name, ["company", "customer_name"], as_dict=1
+            )
+        else:
+            data = frappe.db.get_value(
+                self.reference_doctype, self.reference_name, ["student_name"], as_dict=1
+            )
+            data.update({"company": frappe.defaults.get_defaults().company})
+
+        controller = _get_payment_gateway_controller(self.payment_gateway)
+        controller.validate_transaction_currency(self.currency)
+
+        if hasattr(controller, "validate_minimum_transaction_amount"):
+            print(f'\n\n\n\n\n\n\n\n\n\n\n\n\n{self.grand_total}')
+            controller.validate_minimum_transaction_amount(self.currency, self.grand_total)
+
+        return controller.get_payment_url(
+            **{
+                "amount": flt(self.grand_total, self.precision("grand_total")),
+                "title": data.company.encode("utf-8"),
+                "description": self.subject.encode("utf-8"),
+                "reference_doctype": "Payment Request",
+                "reference_docname": self.name,
+                "payer_email":  frappe.session.user,
+                "payer_name": frappe.safe_encode(data.customer_name),
+                "order_id": self.name,
+                "currency": self.currency,
+            }
+        )
+
+
 
 @frappe.whitelist(allow_guest=True)
 def payment_entry(stripe_token_id, data, reference_doctype, reference_docname):
@@ -128,33 +184,33 @@ def payment_entry(stripe_token_id, data, reference_doctype, reference_docname):
                 "account": receivable_account,
                 "party_type": "Customer",
                 "party": invoice.party,
-                "debit": flt(outstanding_amount),  # Debit in Transaction Currency (e.g., USD)
-                "debit_in_account_currency": flt(debit_amount_in_account_currency),  # Debit in Account Currency (e.g., INR)
-                "credit": 0,
-                "credit_in_account_currency": 0,
+                "debit": 0,  # Debit in Transaction Currency (e.g., USD)
+                "debit_in_account_currency": 0,  # Debit in Account Currency (e.g., INR)
+                "credit": flt(outstanding_amount),
+                "credit_in_account_currency": flt(debit_amount_in_account_currency),
                 "voucher_type": "Sales Invoice",
                 "voucher_no": invoice.reference_name,
                 "company": invoice.company,
                 "posting_date": nowdate(),
                 "against": bank_account,
                 "remarks": "Payment received via Stripe",
-                "debit_in_transaction_currency": outstanding_amount,  # Debit in Transaction Currency
-                "credit_in_transaction_currency": 0  # No credit in transaction currency here
+                "debit_in_transaction_currency": 0,  # Debit in Transaction Currency
+                "credit_in_transaction_currency": outstanding_amount  # No credit in transaction currency here
             },
             {
                 "account": bank_account,
-                "debit": 0,
-                "debit_in_account_currency": 0,
-                "credit": flt(outstanding_amount),  # Credit in Transaction Currency (e.g., USD)
-                "credit_in_account_currency": flt(debit_amount_in_account_currency),  # Credit in Account Currency (e.g., INR)
+                "debit": flt(outstanding_amount),
+                "debit_in_account_currency": flt(debit_amount_in_account_currency),
+                "credit": 0,  # Credit in Transaction Currency (e.g., USD)
+                "credit_in_account_currency": 0,  # Credit in Account Currency (e.g., INR)
                 "voucher_type": "Sales Invoice",
                 "voucher_no": invoice.reference_name,
                 "company": invoice.company,
                 "posting_date": nowdate(),
                 "against": receivable_account,
                 "remarks": "Payment received via Stripe",
-                "debit_in_transaction_currency": 0,  # No debit in transaction currency here
-                "credit_in_transaction_currency": outstanding_amount  # Credit in Transaction Currency
+                "debit_in_transaction_currency": outstanding_amount,  # No debit in transaction currency here
+                "credit_in_transaction_currency": 0, # Credit in Transaction Currency
             }
         ]
 
@@ -169,7 +225,6 @@ def payment_entry(stripe_token_id, data, reference_doctype, reference_docname):
 
         # Mark the Sales Invoice as Paid
         frappe.db.set_value("Sales Invoice", invoice.reference_name, "status", "Paid")
-        frappe.db.set_value("Sales Invoice", invoice.reference_name, "outstanding_amount", outstanding_amount)
 
         # Commit changes to DB
         frappe.db.commit()
