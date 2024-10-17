@@ -54,9 +54,20 @@ function setOutcome(result) {
 							"reference_docname": "{{ reference_docname }}"
 						},callback:function(r){
 							if(r.message.status=='Failed'){
-								frappe.print('Payment Success')
+
+								frappe.msgprint({
+									title: __('Success'),
+									indicator: 'green',
+									message: __('Do not worry Payment is Success.Invoice Status updates soon.')
+								});
+							
 							}else{
-								frappe.print('Do not worry Payment is Success')
+								frappe.msgprint({
+									title: __('Success'),
+									indicator: 'green',
+									message: __('Invoice Status updated')
+								});
+							
 							}
 						}})
 					
