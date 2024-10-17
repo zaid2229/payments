@@ -191,13 +191,13 @@ def payment_entry(stripe_token_id, data, reference_doctype, reference_docname):
                 "voucher_no": invoice.reference_name,
                 "company": invoice.company,
                 "posting_date": nowdate(),
-                "against": 'Stripe-Bayaan Test Mode - BA',
+                "against": 'Stripe-Bayaan Live Mode - BA',
                 "remarks": "Payment received via Stripe",
                 "debit_in_transaction_currency": 0,  # Debit in Transaction Currency
                 "credit_in_transaction_currency": outstanding_amount  # No credit in transaction currency here
             },
             {
-                "account": 'Stripe-Bayaan Test Mode - BA',
+                "account": 'Stripe-Bayaan Live Mode - BA',
                 "debit": flt(outstanding_amount),
                 "debit_in_account_currency": flt(debit_amount_in_account_currency),
                 "credit": 0,  # Credit in Transaction Currency (e.g., USD)

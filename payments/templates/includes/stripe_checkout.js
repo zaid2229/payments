@@ -52,6 +52,12 @@ function setOutcome(result) {
 							"data": JSON.stringify({{ frappe.form_dict|json }}),
 							"reference_doctype": "{{ reference_doctype }}",
 							"reference_docname": "{{ reference_docname }}"
+						},callback:function(r){
+							if(r.message.status=='Failed'){
+								frappe.print('Payment Success')
+							}else{
+								frappe.print('Do not worry Payment is Success')
+							}
 						}})
 					
 					setTimeout(function() {
