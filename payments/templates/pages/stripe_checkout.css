@@ -7,6 +7,7 @@
   box-shadow: 0 1px 3px 0 #e6ebf1;
   -webkit-transition: box-shadow 150ms ease;
   transition: box-shadow 150ms ease;
+  position: relative;
 }
 
 .StripeElement--focus {
@@ -22,7 +23,7 @@
 }
 
 .stripe #payment-form {
-	margin-top: 80px;
+	margin-top: 60px;
 }
 
 .stripe button {
@@ -43,12 +44,12 @@
 }
 
 .stripe button:hover, .stripe button:focus {
-  background: #2bceff;
-  border-color: #0711ff;
+  background: #ffc024;
+  border-color: #ffc024;
 }
 
 .stripe button:active {
-  background: #5e64ff;
+  background: #5ed1ff;
 }
 
 .stripe button:disabled {
@@ -65,10 +66,10 @@
 .stripe label {
   position: relative;
   color: #8898AA;
-  font-weight: 300;
+  font-weight: 250px;
   height: 40px;
   line-height: 40px;
-  margin-left: 20px;
+  margin-left: 10px;
   display: block;
 }
 
@@ -77,13 +78,13 @@
 }
 
 .stripe label>span {
-  width: 20%;
+  width: 15%;
   text-align: right;
   float: left;
 }
 
 .current-card {
-	margin-left: 20px;
+	margin-left: 10px;
 }
 
 .field {
@@ -140,6 +141,6 @@ footer{
 
 @media (max-width: 430px) {
   .InputElement.is-empty.Input.Input--empty{
-    font-size: 20px !important;
+    font-size: 2px !important;
   }
 }

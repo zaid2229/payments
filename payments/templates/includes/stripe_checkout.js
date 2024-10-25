@@ -5,7 +5,7 @@ var elements = stripe.elements();
 var style = {
 	base: {
 		color: '#32325d',
-		lineHeight: '18px',
+		lineHeight: '15px',
 		fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
 		fontSmoothing: 'antialiased',
 		fontSize: '14px',
