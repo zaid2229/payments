@@ -111,3 +111,28 @@
 .field:-ms-input-placeholder {
   color: #CFD7E0;
 }
+
+footer{
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .stripe{
+    margin-left:0px !important;
+    width:100%;
+    }
+}
+
+
+@media (max-width: 600px) {
+  .stripe{
+    margin-left:0px !important;
+    width:100%;
+    }
+}
+@media (max-width: 530px) {
+  .stripe{
+    margin-left:0px !important;
+    width:100% !important;
+    }
+}

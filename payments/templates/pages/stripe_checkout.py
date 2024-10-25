@@ -137,7 +137,8 @@ class CUSTPaymentRequest(Document):
         if hasattr(controller, "validate_minimum_transaction_amount"):
             print(f'\n\n\n\n\n\n\n\n\n\n\n\n\n{self.grand_total}')
             controller.validate_minimum_transaction_amount(self.currency, self.grand_total)
-
+        
+ 
         return controller.get_payment_url(
             **{
                 "amount": flt(self.grand_total, self.precision("grand_total")),
