@@ -4,6 +4,7 @@
 {% block breadcrumbs %}
 	{% include "templates/includes/breadcrumbs.html" %}
 {% endblock %}
+<script src="https://js.stripe.com/v3/"></script>
 
 {% block title %}
 	{{ doc.name }}
@@ -15,7 +16,7 @@
 
 {% block header_actions %}
 	<div class="row">
-		<div class="dropdown">
+		<!-- <div class="dropdown">
 			<button class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 				<span class="font-md">{{ _('Actions') }}</span>
 				<b class="caret"></b>
@@ -33,7 +34,7 @@
 					{{ _("Print") }}
 				</a>
 			</ul>
-		</div>
+		</div> -->
 		{% if show_pay_button and doc.status != 'Paid' %}
 
 			<div class="form-column col-sm-6">
@@ -47,6 +48,34 @@
 				</div>
 			</div>
 		{% endif %}
+				{% if show_subscription %}
+
+			<div class="form-column col-sm-6">
+				<div class="page-header-actions-block" data-html-block="header-actions">
+
+
+
+					<p>
+						<button onclick="window.location.href = '/pay-with-ach?customer_id={{stripe_customer_id}}&invoice_no={{doc.name}}'">Subscribe</button>
+						</a>
+					</p>
+				</div>
+			</div>
+		{% endif %}
+						{% if has_subscription %}
+
+			<div class="form-column col-sm-6">
+				<div class="page-header-actions-block" data-html-block="header-actions">
+
+ <div class="col-md-6">
+            <button id="manage-billing-btn" class="btn btn-primary" >Manage Billing</button>
+        </div>
+				</div>
+			</div>
+		{% endif %}
+
+
+
 	</div>
 {% endblock %}
 
@@ -190,3 +219,29 @@
 		</div>
 	</div>
 {% endmacro %}
+
+
+{% block script %}
+    <script>
+        // When the "Manage Billing" button is clicked
+        document.getElementById('manage-billing-btn').addEventListener('click', function() {
+            // Send a request to the backend to create a billing portal session
+            fetch('/api/method/payments.templates.pages.order.create_stripe_billing_portal_session?customer_id={{ stripe_customer_id }}')
+                .then(response => response.json())
+                .then(data => {
+                    // Open the Stripe Billing Portal in a new window
+                    if (data) {
+						console.log(data.message)
+						window.location.href = data.message
+                        // window.open(data.message, '_blank');
+                    } else {
+                        alert('Failed to create billing portal session');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while opening the billing portal.');
+                });
+        });
+    </script>
+{% endblock %}
