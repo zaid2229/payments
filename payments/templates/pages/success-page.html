@@ -135,17 +135,17 @@
           }),
         });
 
-        const data = await response.json();
+        // const data = await response.json();
 
-        console.log(data.message.url)
+        // console.log(data.message.url)
 
-        let url =data.message.url
+        // let url =data.message.url
 
         // Check if subscription is active and successful
         if (data.message.status === 'active') {
           console.log("Subscription successfully created!");
           alert("Subscription Created Successfully!");
-          window.location.href = `${url}/invoices/${invoiceId}`;
+          window.location.href = `/invoices/${invoiceId}`;
         } else {
           console.error("Subscription creation failed:", data.message.status || "Unknown error");
           alert("Error creating subscription. Please try again.");
