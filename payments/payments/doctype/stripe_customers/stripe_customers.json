@@ -1,0 +1,114 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:customer_id",
+ "creation": "2024-11-29 23:26:59.749426",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "customer_name",
+  "email",
+  "customer_id",
+  "invoice",
+  "customer_mandate_status",
+  "subscription_id",
+  "billing_date",
+  "next_billing_date",
+  "default_payment_method_id",
+  "subscription_status",
+  "subscription_items"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer_id",
+   "fieldtype": "Data",
+   "label": "Customer ID",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Link",
+   "label": "Customer Name",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "invoice",
+   "fieldtype": "Link",
+   "label": "Invoice",
+   "options": "Sales Invoice"
+  },
+  {
+   "fieldname": "customer_mandate_status",
+   "fieldtype": "Select",
+   "label": "Customer Mandate Status",
+   "options": "Pending\nAccepted"
+  },
+  {
+   "fieldname": "subscription_id",
+   "fieldtype": "Data",
+   "label": "Subscription Id"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "subscription_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Subscription Status",
+   "options": "Pending\nActive\nCancelled"
+  },
+  {
+   "fieldname": "subscription_items",
+   "fieldtype": "Table",
+   "label": "Subscription Items",
+   "options": "Subscription Items"
+  },
+  {
+   "fieldname": "default_payment_method_id",
+   "fieldtype": "Data",
+   "label": "Default Payment Method Id",
+   "read_only": 1
+  },
+  {
+   "fieldname": "billing_date",
+   "fieldtype": "Date",
+   "label": "Billing Start Date"
+  },
+  {
+   "fieldname": "next_billing_date",
+   "fieldtype": "Date",
+   "label": "Next Billing Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-01 18:01:58.046956",
+ "modified_by": "Administrator",
+ "module": "Payments",
+ "name": "Stripe Customers",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

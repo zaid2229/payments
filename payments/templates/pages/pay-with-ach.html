@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ACH Direct Debit Mandate</title>
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <div id="payment-form">
+      <form id="payment-method-form">
+        <div id="payment-element"></div>
+        <button id="submit">Subscribe</button>
+      </form>
+    </div>
+
+    <script>
+      // Retrieve query parameters from the URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const customer_id = urlParams.get("customer_id");
+      const invoice_id = urlParams.get("invoice_no");
+
+      // Fetch the Setup Intent using the customer_id from your server
+      fetch(`/api/method/payments.templates.pages.order.get_setup_intent?customer_id=${customer_id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Setup Intent Response:", data);
+
+          // Ensure the client_secret is available
+          if (data.message && data.message.client_secret) {
+            const clientSecret = data.message.client_secret;
+            const url = data.message.url
+
+            // Initialize Stripe with your publishable key
+            const stripe = Stripe("pk_test_8Kz79s1OqGtVv2Ugl1yeDnYu"); // Replace with your actual publishable key
+            const elements = stripe.elements({ clientSecret });
+
+            // Create an instance of the Payment Element
+            const paymentElement = elements.create("payment");
+            paymentElement.mount("#payment-element");
+
+            // Handle form submission
+            const form = document.getElementById("payment-method-form");
+            const submitButton = document.getElementById("submit");
+
+            form.addEventListener("submit", async (event) => {
+              event.preventDefault();
+
+              // Show a loading message
+              submitButton.disabled = true;
+              submitButton.textContent = "Processing...";
+
+              // Confirm the SetupIntent with the payment details
+              const { error, setupIntent } = await stripe.confirmSetup({
+                elements: elements,
+                confirmParams: {
+                  return_url: `${url}/success-page?customer_id=${customer_id}&invoice_id=${invoice_id}`,
+                },
+              });
+
+              if (error) {
+                console.error("Error confirming SetupIntent:", error.message);
+                alert("Error confirming payment method.");
+                submitButton.disabled = false;
+                submitButton.textContent = "Subscribe";
+                return;
+              }
+
+              // Call the function to create a subscription after SetupIntent is confirmed
+              if (setupIntent && setupIntent.status === "succeeded") {
+                createSubscription(customer_id, invoice_id, setupIntent.payment_method);
+              } else {
+                alert("Payment setup incomplete. Please try again.");
+                submitButton.disabled = false;
+                submitButton.textContent = "Subscribe";
+              }
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching SetupIntent:", error);
+          alert("Error loading payment setup.");
+        });
+
+      // Function to create subscription after confirming SetupIntent
+      async function createSubscription(customer_id, invoice_id, payment_method) {
+        try {
+          // Make a POST request to your server to create a subscription
+          const response = await fetch("/api/method/payments.templates.pages.order.create_subscription", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              customer_id: customer_id,
+              invoice_id: invoice_id,
+              payment_method: payment_method,
+            }),
+          });
+
+          const result = await response.json();
+          console.log("Subscription Response:", result);
+
+          if (result.message && result.message.status === "active") {
+            alert("Subscription created successfully!");
+            // Redirect to a success page or update the UI
+            window.location.href = `/success-page?customer_id=${customer_id}&invoice_id=${invoice_id}`;
+          } else {
+            alert("Error creating subscription. Please contact support.");
+          }
+        } catch (error) {
+          console.error("Error creating subscription:", error);
+          alert("Error creating subscription. Please try again.");
+        }
+      }
+    </script>
+  </body>
+</html>

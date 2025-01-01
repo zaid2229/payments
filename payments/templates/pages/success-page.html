@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm Subscription</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 400px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    #status-message {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    #subscribe-btn {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #subscribe-btn:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+
+    #subscribe-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .loading {
+      display: none;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Confirm Your Subscription</h1>
+    <div id="status-message"></div>
+    
+    <!-- Subscribe button -->
+    <button id="subscribe-btn">Subscribe Now</button>
+    <div id="loading-message" class="loading">Please wait... Subscribing</div>
+  </div>
+
+  <script>
+    // Retrieve query parameters from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const customer_id = urlParams.get("customer_id");
+    const invoice_id = urlParams.get("invoice_id");
+
+    const subscribeButton = document.getElementById("subscribe-btn");
+    const statusMessageDiv = document.getElementById("status-message");
+    const loadingMessageDiv = document.getElementById("loading-message");
+
+    // Check subscription status on page load
+    async function checkSubscriptionStatus() {
+      try {
+        const response = await fetch(`/api/method/payments.payments.doctype.stripe_customers.stripe_customers.check_subscription_status?customer_id=${customer_id}&invoice_id=${invoice_id}`);
+        const data = await response.json();
+
+        if (data.message && data.message.status === 'active') {
+          // If subscription is active, disable the button and show a message
+          statusMessageDiv.textContent = "You are already subscribed.";
+          subscribeButton.disabled = true;
+          subscribeButton.style.backgroundColor = "#aaa"; // Change button style
+        } else {
+          statusMessageDiv.textContent = "Click 'Subscribe Now' to complete the subscription.";
+        }
+      } catch (error) {
+        console.error("Error checking subscription status:", error);
+        statusMessageDiv.textContent = "Unable to check subscription status. Please try again later.";
+        subscribeButton.disabled = true;
+      }
+    }
+
+    // Call the function to check subscription status
+    checkSubscriptionStatus();
+
+    // Handle the Subscribe button click
+    subscribeButton.addEventListener("click", async () => {
+      // Show loading message and disable button
+      loadingMessageDiv.style.display = "block";
+      subscribeButton.disabled = true;
+
+      // Trigger subscription creation process
+      await createSubscription(customer_id, invoice_id);
+
+      // Hide loading message after process completes
+      loadingMessageDiv.style.display = "none";
+    });
+
+    // Function to create the subscription
+    async function createSubscription(customerId, invoiceId) {
+      try {
+        const response = await fetch("/api/method/payments.payments.doctype.stripe_customers.stripe_customers.create_stripe_subscription_for_invoice", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            customer_id: customerId,
+            invoice_id: invoiceId, // Pass the invoice_id
+          }),
+        });
+
+        const data = await response.json();
+
+        console.log(data.message.url)
+
+        let url =data.message.url
+
+        // Check if subscription is active and successful
+        if (data.message.status === 'active') {
+          console.log("Subscription successfully created!");
+          alert("Subscription Created Successfully!");
+          window.location.href = `${url}/invoices/${invoiceId}`;
+        } else {
+          console.error("Subscription creation failed:", data.message.status || "Unknown error");
+          alert("Error creating subscription. Please try again.");
+          subscribeButton.disabled = false;
+        }
+      } catch (error) {
+        console.error("Error creating subscription:", error);
+        alert("Error creating subscription. Please try again.");
+        subscribeButton.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

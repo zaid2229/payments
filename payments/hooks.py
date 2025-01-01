@@ -45,6 +45,13 @@ app_license = "MIT"
 # 	"Role": "home_page"
 # }
 
+fixtures = [
+
+    {
+        "dt":"Client Script", "filters":[["name","=","Fetch Items from invoice"]]
+    }
+]
+
 # Generators
 # ----------
 

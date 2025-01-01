@@ -3,9 +3,14 @@
 
 import frappe
 from frappe import _
+import stripe
+
+stripe_settings = frappe.get_doc("Stripe Settings", {'is_default':1})
+        
+stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 
 
-invoice_no = ""
+
 def get_context(context):
     context.no_cache = 1
     context.show_sidebar = True
@@ -69,6 +74,10 @@ def get_context(context):
                 context.stripe_customer_id = stripe_customer[0].get("customer_id")
                 subscription_id = stripe_customer[0].get("subscription_id")
                 print(stripe_customer_id)
+                print(is_default_payment_method(stripe_customer_id))
+
+                context.is_attached_method = is_default_payment_method(stripe_customer_id)
+
                 if stripe_customer_id:
                     context.show_subscription = True
                     print(context.stripe_customer_id)
@@ -80,14 +89,26 @@ def get_context(context):
                         
                     else:
                         context.has_subscription = False
+
+                
             
-            else:
-                frappe.throw(_("Stripe Customer record not found for this ERPNext customer."), frappe.PermissionError)
+            # else:
+            #     frappe.throw(_("Stripe Customer record not found for this ERPNext customer."), frappe.PermissionError)
 
 
             
         
-            
+def is_default_payment_method(customer_id):
+    customer = stripe.Customer.retrieve(customer_id)
+    print(customer)
+    if 'invoice_settings' in customer and 'default_payment_method' in customer['invoice_settings']:
+        current_default_payment_method = customer['invoice_settings']['default_payment_method']
+        
+        print(current_default_payment_method)
+        if current_default_payment_method:
+            return True
+        else:
+            return False           
         
   
 def get_attachments(dt, dn):
@@ -105,45 +126,54 @@ import stripe
 def get_setup_intent(customer_id):
     """
     Generate a SetupIntent for the provided Stripe customer ID.
+
+
     """
     try:
-        stripe_settings = frappe.get_doc("Stripe Settings", 'test bayaan')
+
+        url =frappe.utils.get_url()
+        stripe_settings = frappe.get_doc("Stripe Settings", {'is_default':1})
         
         stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 
         # Create a SetupIntent for the customer
         setup_intent = stripe.SetupIntent.create(
-            customer=customer_id, # Specify ACH Direct Debit
+            customer=customer_id,payment_method_types=["card",'us_bank_account'] # Specify ACH Direct Debit
         )
-        
-        print(setup_intent.id)
+
 
         return {
             "client_secret": setup_intent.client_secret,
             "setup_intent_id": setup_intent.id,
+            "url":url
         }
     except Exception as e:
         frappe.throw(f"Error generating SetupIntent: {str(e)}")
 
 
+
+
 @frappe.whitelist(allow_guest=True)
-def create_stripe_billing_portal_session(customer_id):
+def create_stripe_billing_portal_session(customer_id,invoice_no):
     # Fetch your Stripe secret key
-    stripe_settings = frappe.get_doc("Stripe Settings", "test bayaan")  # Change to your actual settings doc
+    sstripe_settings = frappe.get_doc("Stripe Settings", {'is_default':1})  # Change to your actual settings doc
     stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
+
+    url = frappe.utils.get_url()
+
 
     try:
         # Create a Stripe Billing Portal session for the customer
         session = stripe.billing_portal.Session.create(
             customer=customer_id,
-            return_url="https://127.0.0.1:8000/invoices",  # Replace with the URL where you want the user to return after managing billing
+            return_url=f"{url}/invoices/{invoice_no}",  # Replace with the URL where you want the user to return after managing billing
         )
-        
-        print(session.url)
-        
+          
         # Return the session URL for redirection
         return session.url
     
     except Exception as e:
         frappe.log_error(f"Error creating Stripe billing portal session: {str(e)}", "Stripe Billing Portal Session Creation")
         raise
+
+
