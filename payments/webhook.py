@@ -14,7 +14,7 @@ def handle_stripe_webhook():
             frappe.throw("Invalid webhook request")
 
         # Retrieve Stripe secret
-        stripe_settings = frappe.get_doc("Stripe Settings", {'is_default':1})
+        stripe_settings = frappe.get_doc("Stripe Settings", {'custom_is_default':1})
         stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
         endpoint_secret = stripe_settings.webhook_secret
 
@@ -138,7 +138,7 @@ def create_gl_entry(invoice_name, amount, payment_date):
         # Fetch accounts
         receivable_account = frappe.get_value("Company", frappe.get_value("Sales Invoice", invoice_name, "company"), "default_receivable_account")
         payment_gateway_account = frappe.get_all(
-            "Payment Gateway Account", filters={"is_default": 1}, fields=["payment_account"]
+            "Payment Gateway Account", filters={"custom_is_default": 1}, fields=["payment_account"]
         )[0].payment_account
 
         # Prepare GL Entries

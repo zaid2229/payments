@@ -5,7 +5,7 @@ import frappe
 from frappe import _
 import stripe
 
-stripe_settings = frappe.get_doc("Stripe Settings", {'is_default':1})
+stripe_settings = frappe.get_doc("Stripe Settings", {'custom_is_default':1})
         
 stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 
@@ -73,8 +73,7 @@ def get_context(context):
                 stripe_customer_id = stripe_customer[0].get("customer_id")
                 context.stripe_customer_id = stripe_customer[0].get("customer_id")
                 subscription_id = stripe_customer[0].get("subscription_id")
-                print(stripe_customer_id)
-                print(is_default_payment_method(stripe_customer_id))
+
 
                 context.is_attached_method = is_default_payment_method(stripe_customer_id)
 
@@ -132,7 +131,7 @@ def get_setup_intent(customer_id):
     try:
 
         url =frappe.utils.get_url()
-        stripe_settings = frappe.get_doc("Stripe Settings", {'is_default':1})
+        stripe_settings = frappe.get_doc("Stripe Settings", {'custom_is_default':1})
         
         stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 
@@ -156,7 +155,7 @@ def get_setup_intent(customer_id):
 @frappe.whitelist(allow_guest=True)
 def create_stripe_billing_portal_session(customer_id,invoice_no):
     # Fetch your Stripe secret key
-    sstripe_settings = frappe.get_doc("Stripe Settings", {'is_default':1})  # Change to your actual settings doc
+    sstripe_settings = frappe.get_doc("Stripe Settings", {'custom_is_default':1})  # Change to your actual settings doc
     stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 
     url = frappe.utils.get_url()

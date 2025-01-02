@@ -8,7 +8,7 @@ import stripe
 from frappe import utils
 
 
-stripe_settings = frappe.get_doc("Stripe Settings", {'is_default':1})
+stripe_settings = frappe.get_doc("Stripe Settings", {'custom_is_default':1})
 stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 
 class StripeCustomers(Document):
@@ -33,7 +33,7 @@ class StripeCustomers(Document):
 		subscription_items: DF.Table[SubscriptionItems]
 		subscription_status: DF.Literal["Pending", "Active", "Cancelled"]
 	# end: auto-generated types
-	stripe_settings = frappe.get_doc("Stripe Settings", {'is_default':1})
+	stripe_settings = frappe.get_doc("Stripe Settings", {'custom_is_default':1})
         
 	stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 	
@@ -96,7 +96,7 @@ def create_payment_intent_for_ach(docname):
 @frappe.whitelist(allow_guest=True)
 def create_stripe_subscription_for_invoice(customer_id, invoice_id):
     # Fetch Stripe Settings
-    stripe_settings = frappe.get_doc("Stripe Settings", {'is_default':1})
+    stripe_settings = frappe.get_doc("Stripe Settings", {'custom_is_default':1})
     stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 
     price_ids = []
