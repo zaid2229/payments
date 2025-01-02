@@ -75,10 +75,11 @@
   }
  ],
  "links": [],
- "modified": "2024-12-31 16:46:40.533712",
+ "modified": "2025-01-02 15:38:06.853119",
  "modified_by": "Administrator",
  "module": "Payment Gateways",
  "name": "Stripe Settings",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
