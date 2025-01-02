@@ -8,7 +8,6 @@
  "field_order": [
   "gateway_name",
   "publishable_key",
-  "is_default",
   "column_break_3",
   "secret_key",
   "webhook_secret",
@@ -66,16 +65,10 @@
    "fieldname": "webhook_secret",
    "fieldtype": "Data",
    "label": "Webhook Secret"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_default",
-   "fieldtype": "Check",
-   "label": "Is Default"
   }
  ],
  "links": [],
- "modified": "2025-01-02 15:38:06.853119",
+ "modified": "2025-01-02 18:56:42.606354",
  "modified_by": "Administrator",
  "module": "Payment Gateways",
  "name": "Stripe Settings",
