@@ -6,7 +6,7 @@ from frappe import _
 import stripe
 
 
-stripe_settings = frappe.get_doc("Stripe Settings", Bayaan Test Mode)
+stripe_settings = frappe.get_doc("Stripe Settings", 'Bayaan Test Mode')
         
 stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 

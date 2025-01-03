@@ -259,6 +259,4 @@ def check_subscription_status(customer_id, invoice_id):
 @frappe.whitelist()
 def cancel_subscription(subscription_id):
     response = stripe.Subscription.delete(subscription_id)
-
-    print(response)
     return response
