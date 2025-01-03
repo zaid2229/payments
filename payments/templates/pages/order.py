@@ -135,9 +135,9 @@ def get_setup_intent(customer_id):
 
         url =frappe.utils.get_url()
         stripe_settings_name = frappe.get_all(
-"Stripe Settings", filters={"custom_is_default": 1}, fields=["name"]
-)[0].name
-stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings_name)
+        "Stripe Settings", filters={"custom_is_default": 1}, fields=["name"]
+        )[0].name
+        stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings_name)
         
         stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 
