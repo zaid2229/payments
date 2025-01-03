@@ -14,7 +14,11 @@ def handle_stripe_webhook():
             frappe.throw("Invalid webhook request")
 
         # Retrieve Stripe secret
-        stripe_settings = frappe.get_doc("Stripe Settings", {'custom_is_default':1})
+        stripe_settings_name = frappe.get_all(
+            "Stripe Settings", filters={"custom_is_default": 1}, fields=["name"]
+        )[0].name
+        stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings_name)
+
         stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
         endpoint_secret = stripe_settings.webhook_secret
 
