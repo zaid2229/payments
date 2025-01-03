@@ -1,6 +1,5 @@
 # Copyright (c) 2024, Standardtouch and contributors
 # For license information, please see license.txt
-
 import frappe
 from frappe.model.document import Document
 import stripe
@@ -36,12 +35,7 @@ class StripeCustomers(Document):
 		subscription_items: DF.Table[SubscriptionItems]
 		subscription_status: DF.Literal["Pending", "Active", "Cancelled"]
 	# end: auto-generated types
-	stripe_settings_name = frappe.get_all(
-            "Stripe Settings", filters={"custom_is_default": 1}, fields=["name"]
-        )[0].name
-    stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings_name)
-        
-	stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
+
 	
 	def before_insert(self):
 		self.create_stripe_customer()
