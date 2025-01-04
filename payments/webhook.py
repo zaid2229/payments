@@ -111,10 +111,10 @@ def filter_sales_invoices(stripe_id, payment_date):
             "Sales Invoice",
             filters={
                 "custom_stripe_id": stripe_id,
-                "invoice_billing_date": payment_date,
+                "custom_invoice_billing_date": payment_date,
                 "status": ["not in", ["Draft", "Cancelled", "Paid"]]
             },
-            fields=["name", "invoice_billing_date", "grand_total"]
+            fields=["name", "custom_invoice_billing_date", "grand_total"]
         )
 
         if not sales_invoices:
