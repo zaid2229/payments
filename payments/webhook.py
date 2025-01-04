@@ -139,7 +139,7 @@ def create_gl_entry(invoice_name, amount, payment_date):
         # Fetch accounts
         receivable_account = frappe.get_value("Company", frappe.get_value("Sales Invoice", invoice_name, "company"), "default_receivable_account")
         payment_gateway_account = frappe.get_all(
-            "Payment Gateway Account", filters={"custom_is_default": 1}, fields=["payment_account"]
+            "Payment Gateway Account", filters={"is_default": 1}, fields=["payment_account"]
         )[0].payment_account
 
         # Prepare GL Entries
