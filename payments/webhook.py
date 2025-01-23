@@ -14,7 +14,8 @@ def handle_stripe_webhook():
             frappe.throw("Invalid webhook request")
 
         # Retrieve Stripe secret
-        stripe_settings = frappe.get_doc("Stripe Settings", 'Bayaan Test Mode')
+        stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
+        stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
 
         stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
         endpoint_secret = stripe_settings.webhook_secret
@@ -50,16 +51,17 @@ def process_invoice_payment(invoice_data):
         stripe_customer_id = invoice_data.get("customer")
         amount_received = invoice_data.get("amount_paid") / 100  # Convert from cents to dollars
         payment_date = frappe.utils.datetime.datetime.fromtimestamp(invoice_data.get("created"))
-
+        anchor_date  = frappe.db.get_value('Stripe Customers',stripe_customer_id,'anchor_date')
         # Fetch the Stripe Customer document
         stripe_customer = frappe.get_doc("Stripe Customers", stripe_customer_id)
+        billing_interval = stripe_customer.interval
 
 
         if not stripe_customer.invoice:
             frappe.throw("No selected invoice in Stripe Customer.")
 
         # Process the selected invoice
-        update_next_billing_date(stripe_customer, payment_date)
+        update_next_billing_date(stripe_customer, anchor_date,billing_interval)
         process_selected_invoice(stripe_customer.invoice, amount_received, payment_date)
 
         # Filter other sales invoices
@@ -194,14 +196,22 @@ def get_exchange_rate(from_currency, to_currency):
     }, "exchange_rate") or 1.0  # Default to 1 if no rate found
 
 from frappe.utils import add_months
+from frappe.utils import add_days
 
-def update_next_billing_date(stripe_customer, payment_date):
-    
-    """Set the next billing date in the Stripe Customer doctype"""
+def update_next_billing_date(stripe_customer, anchor_date, interval):
+    """Set the next billing date in the Stripe Customer doctype based on the interval."""
     try:
-        # Calculate the next billing date (e.g., monthly subscription)
-        current_billing_date = payment_date
-        next_billing_date = add_months(current_billing_date, 1)
+        # Determine the next billing date based on the interval
+        if interval == "day":
+            next_billing_date = add_days(anchor_date, 1)
+        elif interval == "week":
+            next_billing_date = add_days(anchor_date, 7)
+        elif interval == "month":
+            next_billing_date = add_months(anchor_date, 1)
+        elif interval == "year":
+            next_billing_date = add_months(anchor_date, 12)
+        else:
+            raise frappe.ValidationError(f"Invalid interval: {interval}. Please specify 'day', 'week', 'month', or 'year'.")
 
         # Update the next billing date in the Stripe Customer
         stripe_customer.next_billing_date = next_billing_date

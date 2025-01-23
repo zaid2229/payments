@@ -6,13 +6,10 @@ from frappe import _
 import stripe
 
 
-stripe_settings = frappe.get_doc("Stripe Settings", 'Bayaan Test Mode')
-        
-stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
-
-
-
 def get_context(context):
+    stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
+    stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
+    stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
     context.no_cache = 1
     context.show_sidebar = True
     context.doc = frappe.get_doc(frappe.form_dict.doctype, frappe.form_dict.name)
@@ -99,6 +96,10 @@ def get_context(context):
             
         
 def is_default_payment_method(customer_id):
+    stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
+    stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
+        
+    stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
     customer = stripe.Customer.retrieve(customer_id)
     print(customer)
     if 'invoice_settings' in customer and 'default_payment_method' in customer['invoice_settings']:
@@ -133,7 +134,8 @@ def get_setup_intent(customer_id):
 
         url =frappe.utils.get_url()
 
-        stripe_settings = frappe.get_doc("Stripe Settings", 'Bayaan Test Mode')
+        stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
+        stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
         
         stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 
@@ -158,8 +160,11 @@ def get_setup_intent(customer_id):
 def create_stripe_billing_portal_session(customer_id,invoice_no):
     # Fetch your Stripe secret key
    
-    stripe_settings = frappe.get_doc("Stripe Settings", 'Bayaan Test Mode')  # Change to your actual settings doc
-    stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
+    stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
+    stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
+            
+    stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False) # Change to your actual settings doc
+
 
     url = frappe.utils.get_url()
 

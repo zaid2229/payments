@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_rename": 1,
  "autoname": "field:gateway_name",
  "creation": "2017-03-09 17:18:29.458397",
  "doctype": "DocType",
@@ -8,9 +9,11 @@
  "field_order": [
   "gateway_name",
   "publishable_key",
+  "interval",
   "column_break_3",
   "secret_key",
   "webhook_secret",
+  "is_default",
   "section_break_5",
   "header_img",
   "column_break_7",
@@ -65,10 +68,22 @@
    "fieldname": "webhook_secret",
    "fieldtype": "Data",
    "label": "Webhook Secret"
+  },
+  {
+   "fieldname": "interval",
+   "fieldtype": "Select",
+   "label": "Interval",
+   "options": "\nMonth\nDaily\nYearly"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_default",
+   "fieldtype": "Check",
+   "label": "Is Default"
   }
  ],
  "links": [],
- "modified": "2025-01-02 18:56:42.606354",
+ "modified": "2025-01-23 15:11:18.490799",
  "modified_by": "Administrator",
  "module": "Payment Gateways",
  "name": "Stripe Settings",
