@@ -45,10 +45,9 @@ class StripeCustomers(Document):
 		frappe.db.commit()
 
 	def create_stripe_customer(self):
-
 		stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
-	    stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
-	    stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
+		stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
+		stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 		"""
 		This function is called when a new Stripe Customer is created.
 		It creates a customer in Stripe and saves the Stripe Customer ID in ERPNext.
