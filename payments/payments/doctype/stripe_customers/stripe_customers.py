@@ -33,10 +33,8 @@ class StripeCustomers(Document):
 		subscription_status: DF.Literal["Pending", "Active", "Cancelled"]
 	# end: auto-generated types
 
-	stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
-	stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
-	stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
-	
+
+
 	def before_insert(self):
 		self.create_stripe_customer()
 		self.set_stripe_id()
@@ -47,6 +45,10 @@ class StripeCustomers(Document):
 		frappe.db.commit()
 
 	def create_stripe_customer(self):
+
+		stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
+	    stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
+	    stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 		"""
 		This function is called when a new Stripe Customer is created.
 		It creates a customer in Stripe and saves the Stripe Customer ID in ERPNext.
@@ -72,6 +74,9 @@ class StripeCustomers(Document):
 
 @frappe.whitelist()
 def create_payment_intent_for_ach(docname):
+	stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
+	stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
+	stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 	"""
 	Creates a PaymentIntent for ACH Direct Debit and returns the client secret to the client-side.
 	"""
@@ -274,6 +279,9 @@ def check_subscription_status(customer_id, invoice_id):
 
 @frappe.whitelist(allow_guest=True)
 def cancel_subscription(subscription_id):
+	stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
+	stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
+	stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
 	response = stripe.Subscription.delete(subscription_id)
 	return response
 
