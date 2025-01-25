@@ -17,6 +17,7 @@
   "default_payment_method_id",
   "column_break_irzy",
   "interval",
+  "day_of_month",
   "anchor_date",
   "auto_pay_end_date",
   "subscription_status",
@@ -55,6 +56,7 @@
   {
    "fieldname": "customer_mandate_status",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Customer Mandate Status",
    "options": "Pending\nAccepted",
    "read_only": 1
@@ -83,6 +85,7 @@
   {
    "fieldname": "default_payment_method_id",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Default Payment Method Id",
    "read_only": 1
   },
@@ -90,7 +93,7 @@
    "fieldname": "billing_date",
    "fieldtype": "Date",
    "label": "Billing Start Date",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "next_billing_date",
@@ -126,11 +129,18 @@
   {
    "fieldname": "section_break_wpow",
    "fieldtype": "Section Break"
+  },
+  {
+   "description": "Enter payment day of the month",
+   "fieldname": "day_of_month",
+   "fieldtype": "Int",
+   "label": "Day of Month",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-15 13:30:18.772632",
+ "modified": "2025-01-25 20:25:40.716315",
  "modified_by": "Administrator",
  "module": "Payments",
  "name": "Stripe Customers",

@@ -253,6 +253,7 @@ def create_stripe_subscription_for_invoice(customer_id, invoice_id):
 		# Save subscription details in the Stripe Customers document
 		frappe.db.set_value('Stripe Customers', customer_id, 'subscription_id', subscription.id)
 		frappe.db.set_value('Stripe Customers', customer_id, 'subscription_status', 'Active')
+		frappe.db.set_value('Stripe Customers',customer_id,'billing_date',subscription_start_date)
 		# frappe.db.set_value('Stripe Customers',customer_id,'billing_date',frappe.utils.nowdate())
 		frappe.db.commit()
 

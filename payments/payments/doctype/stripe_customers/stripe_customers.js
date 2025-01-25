@@ -43,6 +43,26 @@ frappe.ui.form.on("Stripe Customers", {
 
 
     },
+    day_of_month: function (frm) {
+        if (frm.doc.day_of_month) {
+            let day = frm.doc.day_of_month;
+            let today = frappe.datetime.now_date(); // Get the current date
+            let current_month = today.slice(0, 7);  // Extract "YYYY-MM" from the date
+            
+            // Construct the new anchor date in the format "YYYY-MM-DD"
+            let new_anchor_date = `${current_month}-${String(day).padStart(2, '0')}`;
+            
+            // Check if the date is valid
+            if (!frappe.datetime.validate(new_anchor_date)) {
+                frappe.msgprint(__('Invalid day! Please enter a valid day in the current month.'));
+                frm.set_value('anchor_date', null); // Clear anchor date if invalid
+                return;
+            }
+            
+            // Update the Anchor Date field
+            frm.set_value('anchor_date', new_anchor_date);
+        }
+    },
     customer_name: function (frm) {
         if (frm.doc.customer_name) {
             frm.set_query('invoice', function () {
