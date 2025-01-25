@@ -119,8 +119,9 @@
    "description": "Select Payment Date for billing",
    "fieldname": "anchor_date",
    "fieldtype": "Date",
+   "hidden": 1,
    "label": "Anchor Date",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.interval !='day'"
   },
   {
    "fieldname": "column_break_irzy",
@@ -131,16 +132,18 @@
    "fieldtype": "Section Break"
   },
   {
+   "depends_on": "eval:doc.interval !='day'",
    "description": "Enter payment day of the month",
    "fieldname": "day_of_month",
    "fieldtype": "Int",
    "label": "Day of Month",
+   "mandatory_depends_on": "eval:doc.interval !='day'",
    "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-25 20:25:40.716315",
+ "modified": "2025-01-25 22:09:24.452927",
  "modified_by": "Administrator",
  "module": "Payments",
  "name": "Stripe Customers",

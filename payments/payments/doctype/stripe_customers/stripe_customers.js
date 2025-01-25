@@ -44,7 +44,7 @@ frappe.ui.form.on("Stripe Customers", {
 
     },
     day_of_month: function (frm) {
-        if (frm.doc.day_of_month) {
+        if (frm.doc.day_of_month && frm.doc.interval !='day') {
             let day = frm.doc.day_of_month;
             let today = frappe.datetime.now_date(); // Get the current date
             let current_month = today.slice(0, 7);  // Extract "YYYY-MM" from the date
