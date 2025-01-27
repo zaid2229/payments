@@ -69,7 +69,8 @@ frappe.ui.form.on("Stripe Customers", {
                 return {
                     filters: {
                         customer: frm.doc.customer_name,
-                        status: ['not in', ['Not Paid', 'Draft','Cancelled']]
+                        status: ['not in', ['Not Paid', 'Draft','Cancelled']],
+                        custom_is_billing_invoice:1
                     }
                 };
             });
