@@ -116,13 +116,17 @@ def create_stripe_subscription_for_invoice(customer_id, invoice_id):
 	
 	anchor_date= stripe_details.anchor_date
 	end_date = stripe_details.auto_pay_end_date
-	if isinstance(anchor_date, datetime.date):
-		anchor_date = anchor_date.strftime("%Y-%m-%d")
 	if isinstance(end_date, datetime.date):
 		end_date = end_date.strftime("%Y-%m-%d")
 
+	if anchor_date:
+		if isinstance(anchor_date, datetime.date):
+			anchor_date = anchor_date.strftime("%Y-%m-%d")
+		anchor_date = int(datetime.datetime.strptime(anchor_date, "%Y-%m-%d").timestamp())
+
+
 	invoice = frappe.get_doc("Sales Invoice", invoice_id)
-	anchor_date = int(datetime.datetime.strptime(anchor_date, "%Y-%m-%d").timestamp())
+
 	end_date = int(datetime.datetime.strptime(end_date, "%Y-%m-%d").timestamp())
 
 	try:

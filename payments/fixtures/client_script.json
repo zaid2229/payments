@@ -4,10 +4,10 @@
   "doctype": "Client Script",
   "dt": "Stripe Customers",
   "enabled": 1,
-  "modified": "2025-01-01 16:07:00.827843",
+  "modified": "2025-01-27 09:31:12.961429",
   "module": null,
   "name": "Fetch Items from invoice",
-  "script": "frappe.ui.form.on('Stripe Customers', {\n    invoice: function(frm) {\n        if(frm.doc.invoice) {\n            frm.clear_table('subscription_items');\n            frappe.call({\n                method: 'frappe.client.get',\n                args: {\n                    doctype: 'Sales Invoice',\n                    name: frm.doc.invoice\n                },\n                callback: function(response) {\n                    if(response.message) {\n                        let sales_invoice = response.message;\n                        console.log(sales_invoice)\n                        sales_invoice.items.forEach(item => {\n                            let child = frm.add_child('subscription_items');\n                            child.item_name = item.item_name;\n                            child.rate = item.rate;\n                        });\n                        frm.refresh_field('subscription_items');\n                    }\n                }\n            });\n        }\n    }\n});",
+  "script": "frappe.ui.form.on('Stripe Customers', {\n    invoice: function(frm) {\n        if(frm.doc.invoice) {\n            frm.clear_table('subscription_items');\n            frappe.call({\n                method: 'frappe.client.get',\n                args: {\n                    doctype: 'Sales Invoice',\n                    name: frm.doc.invoice\n                },\n                callback: function(response) {\n                    if(response.message) {\n                        let sales_invoice = response.message;\n                        console.log(sales_invoice)\n                        sales_invoice.items.forEach(item => {\n                            let child = frm.add_child('subscription_items');\n                            child.item_name = item.item_code;\n                            child.rate = item.rate;\n                        });\n                        frm.refresh_field('subscription_items');\n                    }\n                }\n            });\n        }\n    }\n});",
   "view": "Form"
  }
 ]

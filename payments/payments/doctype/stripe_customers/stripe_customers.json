@@ -132,6 +132,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "default": "0",
    "depends_on": "eval:doc.interval !='day'",
    "description": "Enter payment day of the month",
    "fieldname": "day_of_month",
@@ -143,7 +144,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-25 22:09:24.452927",
+ "modified": "2025-01-27 09:30:44.715078",
  "modified_by": "Administrator",
  "module": "Payments",
  "name": "Stripe Customers",
