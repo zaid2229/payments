@@ -4,6 +4,7 @@
 frappe.ui.form.on("Stripe Customers", {
 
     refresh: function (frm) {
+        frm.trigger('filter_invoices')
         if (frm.doc.customer_id ) {
             frm.add_custom_button(__('Send Email'), function () {
                 frappe.call({
@@ -42,6 +43,8 @@ frappe.ui.form.on("Stripe Customers", {
         }
 
 
+    },customer_name:function(frm){
+        trigger.filter_invoices(frm)
     },
     day_of_month: function (frm) {
         if (frm.doc.day_of_month && frm.doc.interval !='day') {
@@ -63,7 +66,7 @@ frappe.ui.form.on("Stripe Customers", {
             frm.set_value('anchor_date', new_anchor_date);
         }
     },
-    customer_name: function (frm) {
+    filter_invoices: function (frm) {
         if (frm.doc.customer_name) {
             frm.set_query('invoice', function () {
                 return {

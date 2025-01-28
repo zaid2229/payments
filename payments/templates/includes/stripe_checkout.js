@@ -1,111 +1,116 @@
 var stripe = Stripe("{{ publishable_key }}");
-
 var elements = stripe.elements();
 
 var style = {
-	base: {
-		color: '#32325d',
-		lineHeight: '15px',
-		fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-		fontSmoothing: 'antialiased',
-		fontSize: '14px',
-		'::placeholder': {
-			color: '#aab7c4'
-		}
-	},
-	invalid: {
-		color: '#fa755a',
-		iconColor: '#fa755a'
-	}
+    base: {
+        color: '#32325d',
+        lineHeight: '15px',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '14px',
+        '::placeholder': {
+            color: '#aab7c4'
+        }
+    },
+    invalid: {
+        color: '#fa755a',
+        iconColor: '#fa755a'
+    }
 };
 
 var card = elements.create('card', {
-	hidePostalCode: true,
-	style: style
+    hidePostalCode: true,
+    style: style
 });
 
 card.mount('#card-element');
 
 function setOutcome(result) {
-
-	if (result.token) {
-		$('#submit').prop('disabled', true)
-		$('#submit').html(__('Processing...'))
-		frappe.call({
-			method:"payments.templates.pages.stripe_checkout.make_payment",
-			freeze:true,
-			headers: {"X-Requested-With": "XMLHttpRequest"},
-			args: {
-				"stripe_token_id": result.token.id,
-				"data": JSON.stringify({{ frappe.form_dict|json }}),
-				"reference_doctype": "{{ reference_doctype }}",
-				"reference_docname": "{{ reference_docname }}"
-			},
-			callback: function(r) {
-				if (r.message.status == "Completed") {
-					$('#submit').hide()
-					$('.success').show()
-					frappe.call({
-						method:"payments.templates.pages.stripe_checkout.payment_entry",
-						args: {
-							"stripe_token_id": result.token.id,
-							"data": JSON.stringify({{ frappe.form_dict|json }}),
-							"reference_doctype": "{{ reference_doctype }}",
-							"reference_docname": "{{ reference_docname }}"
-						},callback:function(r){
-							if(r.message.status=='Failed'){
-
-								frappe.msgprint({
-									title: __('Success'),
-									indicator: 'green',
-									message: __('Do not worry Payment is Success.Invoice Status updates soon.')
-								});
-							
-							}else{
-								frappe.msgprint({
-									title: __('Success'),
-									indicator: 'green',
-									message: __('Invoice Status updated')
-								});
-							
-							}
-						}})
-					
-					setTimeout(function() {
-						window.location.href = r.message.redirect_to
-					}, 2000);
-				} else {
-					$('#submit').hide()
-					$('.error').show()
-					setTimeout(function() {
-						window.location.href = r.message.redirect_to
-					}, 2000);
-				}
-			}
-		});
-
-	} else if (result.error) {
-		$('.error').html(result.error.message);
-		$('.error').show()
-	}
+    if (result.token) {
+        $('#submit').prop('disabled', true).html('Processing...');
+        frappe.call({
+            method: "payments.templates.pages.stripe_checkout.make_payment",
+            freeze: true,
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            args: {
+                "stripe_token_id": result.token.id,
+                "data": JSON.stringify({{ frappe.form_dict|json }}),
+                "reference_doctype": "{{ reference_doctype }}",
+                "reference_docname": "{{ reference_docname }}"
+            },
+            callback: function(r) {
+                if (r.message.status == "Completed") {
+                    $('#submit').hide();
+                    $('.success').show();
+                    frappe.call({
+                        method: "payments.templates.pages.stripe_checkout.payment_entry",
+                        args: {
+                            "stripe_token_id": result.token.id,
+                            "data": JSON.stringify({{ frappe.form_dict|json }}),
+                            "reference_doctype": "{{ reference_doctype }}",
+                            "reference_docname": "{{ reference_docname }}"
+                        },
+                        callback: function(r) {
+                            if (r.message.status == 'Failed') {
+                                frappe.msgprint({
+                                    title: __('Success'),
+                                    indicator: 'green',
+                                    message: __('Do not worry, Payment is successful. Invoice status updates soon.')
+                                });
+                            } else {
+                                frappe.msgprint({
+                                    title: __('Success'),
+                                    indicator: 'green',
+                                    message: __('Invoice status updated.')
+                                });
+                            }
+                        }
+                    });
+                    setTimeout(function() {
+                        window.location.href = r.message.redirect_to;
+                    }, 2000);
+                } else {
+                    $('#submit').hide();
+                    $('.error').show();
+                    setTimeout(function() {
+                        window.location.href = r.message.redirect_to;
+                    }, 2000);
+                }
+            }
+        });
+    } else if (result.error) {
+        $('.error').html(result.error.message);
+        $('.error').show();
+        $('#submit').prop('disabled', false).html('Pay'); // Re-enable button on error
+    }
 }
 
 card.on('change', function(event) {
-	var displayError = document.getElementById('card-errors');
-	if (event.error) {
-		displayError.textContent = event.error.message;
-	} else {
-		displayError.textContent = '';
-	}
+    var displayError = document.getElementById('card-errors');
+    if (event.error) {
+        displayError.textContent = event.error.message;
+    } else {
+        displayError.textContent = '';
+    }
 });
 
+// Prevent multiple clicks
+let isProcessing = false;
+
 frappe.ready(function() {
-	$('#submit').off("click").on("click", function(e) {
-		e.preventDefault();
-		var extraDetails = {
-			name: $('input[name=cardholder-name]').val(),
-			email: $('input[name=cardholder-email]').val()
-		}
-		stripe.createToken(card, extraDetails).then(setOutcome);
-	})
+    $('#submit').off("click").on("click", function(e) {
+        e.preventDefault();
+        if (isProcessing) return; // Ignore if already processing
+        isProcessing = true;
+
+        $('#submit').prop('disabled', true).html('Processing...');
+        var extraDetails = {
+            name: $('input[name=cardholder-name]').val(),
+            email: $('input[name=cardholder-email]').val()
+        };
+
+        stripe.createToken(card, extraDetails).then(setOutcome).finally(() => {
+            isProcessing = false; // Reset after processing
+        });
+    });
 });
