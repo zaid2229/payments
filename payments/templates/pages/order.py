@@ -8,8 +8,9 @@ import stripe
 
 def get_context(context):
     stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
-    stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
-    stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
+    if stripe_settings:
+        stripe_settings = frappe.get_doc("Stripe Settings", stripe_settings[0].name)
+        stripe.api_key = stripe_settings.get_password(fieldname="secret_key", raise_exception=False)
     context.no_cache = 1
     context.show_sidebar = True
     context.doc = frappe.get_doc(frappe.form_dict.doctype, frappe.form_dict.name)
@@ -157,7 +158,7 @@ def get_setup_intent(customer_id):
 
 
 @frappe.whitelist(allow_guest=True)
-def create_stripe_billing_portal_session(customer_id,invoice_no):
+def create_stripe_billing_portal_session(customer_id,invoice_no=None):
     # Fetch your Stripe secret key
    
     stripe_settings = frappe.db.get_all("Stripe Settings", filters={'is_default':1})
@@ -170,14 +171,28 @@ def create_stripe_billing_portal_session(customer_id,invoice_no):
 
 
     try:
-        # Create a Stripe Billing Portal session for the customer
-        session = stripe.billing_portal.Session.create(
-            customer=customer_id,
-            return_url=f"{url}/invoices/{invoice_no}",  # Replace with the URL where you want the user to return after managing billing
-        )
-          
-        # Return the session URL for redirection
-        return session.url
+        if invoice_no:
+
+            # Create a Stripe Billing Portal session for the customer
+            session = stripe.billing_portal.Session.create(
+                customer=customer_id,
+                return_url=f"{url}/invoices/{invoice_no}",  # Replace with the URL where you want the user to return after managing billing
+            )
+                
+            # Return the session URL for redirection
+            return session.url
+
+        else:
+
+                        # Create a Stripe Billing Portal session for the customer
+            session = stripe.billing_portal.Session.create(
+                customer=customer_id,
+                return_url=f"{url}/invoices",  # Replace with the URL where you want the user to return after managing billing
+            )
+                
+            # Return the session URL for redirection
+            return session.url
+
     
     except Exception as e:
         frappe.log_error(f"Error creating Stripe billing portal session: {str(e)}", "Stripe Billing Portal Session Creation")

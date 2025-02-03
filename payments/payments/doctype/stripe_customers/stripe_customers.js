@@ -44,7 +44,8 @@ frappe.ui.form.on("Stripe Customers", {
 
 
     },customer_name:function(frm){
-        trigger.filter_invoices(frm)
+        frm.trigger('filter_invoices')
+        console.log('hiiiiiii')
     },
     day_of_month: function (frm) {
         if (frm.doc.day_of_month && frm.doc.interval !='day') {

@@ -5,10 +5,19 @@
     <script src="https://js.stripe.com/v3/"></script>
   </head>
   <body>
+
+
+    <div id="header">
+      <img src="{{ get_header() }}" alt="Header Image" style="max-width: 300px; height: auto;">
+  </div>
+
     <div id="payment-form">
       <form id="payment-method-form">
         <div id="payment-element"></div>
-        <button id="submit">Subscribe</button>
+        <button type="submit" 
+        id="submit" class="btn btn-primary">
+        Submit
+      </button>
       </form>
     </div>
 
@@ -112,5 +121,82 @@
         }
       }
     </script>
+    <style>
+      /* Form Container */
+#payment-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 10vh; /* Ensures full viewport height */
+    background-color: #f4f4f4;
+    padding: 10%;
+}
+
+/* Form Styling */
+#payment-method-form {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px; /* Makes sure form is larger on mobile */
+    text-align: center;
+}
+
+#header {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;
+    width: 100%;
+    padding: 20px 0; /* Add space around the header */
+    background-color: white; /* Ensure background matches */
+}
+
+/* Payment Element */
+#payment-element {
+    margin-bottom: 100px;
+}
+
+/* Button Styling */
+#submit {
+    background-color: #FFC024;
+    color: black;
+    font-weight: bold;
+    height: 30px;
+    width: 30%;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Hover Effect */
+#submit:hover {
+    background-color: #e0a800;
+    transform: scale(1.05);
+}
+
+/* Button Active Effect */
+#submit:active {
+    background-color: #c89100;
+    transform: scale(0.98);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    #payment-method-form {
+        width: 90%; /* Increases width for better visibility */
+        padding: 10px;
+    }
+
+    #submit {
+        font-size: 14px; /* Adjusts text size on mobile */
+        height: 40px;
+    }
+}
+
+      </style>
   </body>
 </html>

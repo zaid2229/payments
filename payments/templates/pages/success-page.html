@@ -55,6 +55,19 @@
     #subscribe-btn:hover {
       background-color: #0056b3;
     }
+    #header {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;
+    width: 100%;
+    padding: 20px 0; /* Add space around the header */
+    background-color: white; /* Ensure background matches */
+    position: fixed; /* Fix the header at the top */
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Ensure it stays on top */
+}
+
 
     .loading {
       display: none;
@@ -65,12 +78,17 @@
   </style>
 </head>
 <body>
+  <header>
+  <div id="header">
+    <img src="{{ get_header() }}" alt="Header Image" style="max-width: 300px; height: auto;">
+</div>
+  </header>
   <div class="container">
     <h1>Confirm Your Subscription</h1>
     <div id="status-message"></div>
     
     <!-- Subscribe button -->
-    <button id="subscribe-btn">Subscribe Now</button>
+    <button id="subscribe-btn">Confirm</button>
     <div id="loading-message" class="loading">Please wait... Subscribing</div>
   </div>
 
@@ -96,7 +114,7 @@
           subscribeButton.disabled = true;
           subscribeButton.style.backgroundColor = "#aaa"; // Change button style
         } else {
-          statusMessageDiv.textContent = "Click 'Subscribe Now' to complete the subscription.";
+          statusMessageDiv.textContent = "Click 'Confirm' to complete the subscription.";
         }
       } catch (error) {
         console.error("Error checking subscription status:", error);

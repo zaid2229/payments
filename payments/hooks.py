@@ -17,6 +17,7 @@ app_license = "MIT"
 # include js, css files in header of web template
 # web_include_css = "/assets/pay/css/pay.css"
 # web_include_js = "/assets/pay/js/pay.js"
+web_include_js = "/assets/payments/js/custom6.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "pay/public/scss/website"
@@ -62,10 +63,14 @@ fixtures = [
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "pay.utils.jinja_methods",
-# 	"filters": "pay.utils.jinja_filters"
-# }
+jinja = {
+	# "methods": "pay.utils.jinja_methods",
+	# "filters": "pay.utils.jinja_filters",
+	"methods":[
+		"payments.templates.pages.pay-with-ach.get_header",
+		"payments.templates.pages.pay-with-ach.get_customer_id"
+	]
+}
 
 # Installation
 # ------------
