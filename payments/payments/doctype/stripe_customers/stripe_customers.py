@@ -289,13 +289,64 @@ def cancel_subscription(subscription_id):
 	response = stripe.Subscription.delete(subscription_id)
 	return response
 
+import frappe
+from frappe.utils.file_manager import save_file
+from frappe.core.doctype.communication.email import make
+from frappe import render_template
+
 @frappe.whitelist(allow_guest=True)
 def invoice_subscription_notification(name):
 	try:
-		invoice = frappe.get_doc("Stripe Customers", name)
-		invoice.run_notifications("to_subscribe")
+		# Fetch Stripe Customer Document
+		stripe_customer = frappe.get_doc("Stripe Customers", name)
 
-		return 'success'
-	
+		# Get the linked ERPNext Invoice
+		if not stripe_customer.invoice:
+			return "No ERPNext Invoice linked to this customer."
+
+		invoice_name = stripe_customer.invoice
+		invoice = frappe.get_doc("Sales Invoice", invoice_name)
+
+		default_print_format = frappe.db.get_value("Property Setter", {"doc_type": "Sales Invoice", "property": "default_print_format"}, "value") or "Standard"
+
+		frappe.logger().info(f"Using Print Format: {default_print_format}")
+
+		# ✅ Attach Invoice as a Print Format PDF
+		my_attachments = [frappe.attach_print(
+			doctype="Sales Invoice",
+			name=invoice_name,
+			print_format=default_print_format,
+			file_name=f"{invoice_name}.pdf"
+		)]
+
+		# Debugging: Check if the PDF is properly attached
+		frappe.logger().info(f"Generated Attachments: {my_attachments}")
+
+		# Prepare email content using an Email Template
+		email_template = frappe.get_doc("Email Template", "Auto Pay Invoice Email")
+
+
+		email_body = frappe.render_template(email_template.response_html, {
+			"customer_name": stripe_customer.customer_name,
+			"invoice": invoice_name
+		})
+
+
+		print(email_body)
+
+		subject = f"Set Up Auto-Pay for Invoice {invoice_name}"
+
+		frappe.sendmail(
+			recipients=[stripe_customer.email],  # Ensure the email field exists
+			subject=subject,
+			message=email_body,
+			reference_doctype="Sales Invoice",
+			reference_name=invoice_name,
+			attachments=my_attachments
+		)
+
+		return "success"
+
 	except Exception as e:
-		frappe.log_error(message=str(e),title="Invoice Subscription Notification Error")
+		frappe.log_error(message=str(e), title="Invoice Subscription Notification Error")
+
