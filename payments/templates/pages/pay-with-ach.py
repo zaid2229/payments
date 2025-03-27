@@ -55,7 +55,7 @@ def get_parents_for_user(parenttype: str) -> list[str]:
 	).run(pluck="name")
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_roles(uid):
     print(uid)
 
