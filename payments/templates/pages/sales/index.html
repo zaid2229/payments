@@ -1,0 +1,88 @@
+{% extends "templates/web.html" %}
+{% block page_content %}
+<div class="portal-list-view">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">{{ _("Invoices") }}</h4>
+                    {% if invoices %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                {% for doc in invoices %}
+                                <tr class="clickable-row" onclick="window.location='/invoices/{{ doc.name }}'">
+                                    <td class="invoice-number"><strong>{{ doc.name }}</strong></td>
+                                    <td>{{ doc.custom_invoice_month }}</td>
+                                    <td>
+                                        <span class="indicator {% if doc.status == 'Paid' %}green{% else %}red{% endif %}">
+                                            <span class="status-dot"></span>{{ doc.status }}
+                                        </span>
+                                    </td>
+                                    <td class="customer-name">{{ doc.customer }}</td>
+                                    <td style="text-align: right;"><strong>${{ doc.grand_total }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        {{ _("No invoices found") }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .table td {
+        border: none;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+    }
+    .invoice-number {
+        width: 30%;
+    }
+    .customer-name {
+        width: 15%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+    .indicator {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 6px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        gap: 0px;
+    }
+    .indicator.green {
+        color: #28a745;
+        background-color: #E5F2E9;
+    }
+    .indicator.green .status-dot {
+        background-color: #28a745;
+    }
+    .indicator.red {
+        color: #dc3545;
+        background-color: #ffebee;
+    }
+    .indicator.red .status-dot {
+        background-color: #dc3545;
+    }
+    .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .clickable-row:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

@@ -18,6 +18,9 @@ app_license = "MIT"
 # web_include_css = "/assets/pay/css/pay.css"
 # web_include_js = "/assets/pay/js/pay.js"
 web_include_js = "/assets/payments/js/custom6.js"
+website_route_rules = [
+    {"from_route": "/sales", "to_route": "pages/sales/index.html"}
+]
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "pay/public/scss/website"
