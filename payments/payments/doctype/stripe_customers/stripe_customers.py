@@ -338,7 +338,7 @@ def invoice_subscription_notification(name):
 
 		frappe.sendmail(
 			recipients=[stripe_customer.email],  # Ensure the email field exists
-			sender='accounts@bayaanacademy.com'
+			sender='accounts@bayaanacademy.com',
 			subject=subject,
 			message=email_body,
 			reference_doctype="Sales Invoice",
