@@ -14,11 +14,12 @@ $(document).ready(function () {
                 // If user has "Customer" role, show Sales Invoice and Manage Billing
 
                 // Create and append "Go to Invoices" link
-                var link = $('<div class="col d-flex justify-content-between align-items-center"> <a href="/invoices" class="invoice-link">Go to Invoices......</a></div>');
+                var link = $('<div class="text-center"><button id="sales-invoice-btn" class="col d-flex justify-content-center align-items-center btn btn-info"> <a href="/invoices" class="invoice-link text-white">Go to Invoices</a></button></div>');
                 $(".row.account-info").append(link);
+                
 
                 // Create and append "Manage Billing" button
-                var manageBillingBtn = $('<button id="manage-billing-btn" class="btn btn-primary" aria-label="Manage billing details">Manage Billing</button>');
+                var manageBillingBtn = $('<button id="manage-billing-btn" class="btn btn-primary" aria-label="Manage billing details">Manage Auto Pay</button>');
                 $(".row.account-info").append(manageBillingBtn);
 
                 // Attach event listener for Manage Billing button
