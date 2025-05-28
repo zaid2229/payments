@@ -13,9 +13,9 @@ $(document).ready(function () {
             if (data.message && data.message.includes("Customer")) {
                 // If user has "Customer" role, show Sales Invoice and Manage Billing
 
-                // Create and append "Go to Invoices" link
-                var link = $('<div class="text-center"><button id="sales-invoice-btn" class="col d-flex justify-content-center align-items-center btn btn-info"> <a href="/invoices" class="invoice-link text-white">Go to Invoices</a></button></div>');
+                var link = $('<div class="text-center"><a href="/invoices" id="sales-invoice-btn" class="col d-flex justify-content-center align-items-center btn btn-info text-white">Go to Invoices</a></div>');
                 $(".row.account-info").append(link);
+                
                 
 
                 // Create and append "Manage Billing" button

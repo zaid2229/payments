@@ -17,7 +17,7 @@ app_license = "MIT"
 # include js, css files in header of web template
 # web_include_css = "/assets/pay/css/pay.css"
 # web_include_js = "/assets/pay/js/pay.js"
-web_include_js = "/assets/payments/js/custom12.js"
+web_include_js = "/assets/payments/js/custom14.js"
 # hooks.py
 
 # \\wsl.localhost\Ubuntu\home\zaid\frappe-virtual-env\erp15-bench\apps\payments\payments\hooks.py
